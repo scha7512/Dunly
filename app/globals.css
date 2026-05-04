@@ -53,12 +53,6 @@ body {
   color: white;
 }
 
-/* Curseur custom caché sur desktop */
-@media (pointer: fine) {
-  * {
-    cursor: none !important;
-  }
-}
 
 /* Fonts */
 .font-display {
