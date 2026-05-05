@@ -92,7 +92,13 @@ export default function SignupPage() {
         },
       })
       if (error) throw error
-      setEmailSent(true)
+      const { data: { session } } = await supabase.auth.getSession()
+      if (session) {
+        toast.success('Compte créé avec succès !')
+        router.push('/onboarding')
+      } else {
+        setEmailSent(true)
+      }
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Erreur lors de l\'inscription'
       toast.error(message.includes('already registered') ? 'Cet email est déjà utilisé' : message)
