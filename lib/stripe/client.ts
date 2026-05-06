@@ -68,12 +68,12 @@ export const PLANS = {
 
 export type PlanKey = keyof typeof PLANS
 
-// Email admin — accès illimité sans abonnement
-export const ADMIN_EMAIL = 'tantonsacha@gmail.com'
+// Email admin — accès illimité sans abonnement (défini via variable d'environnement)
+export const ADMIN_EMAIL = process.env.ADMIN_EMAIL ?? ''
 
 // Vérifie si un utilisateur peut ajouter plus de clients/factures
 export function canAddMore(plan: string, email: string, type: 'clients' | 'factures', currentCount: number): boolean {
-  if (email === ADMIN_EMAIL) return true
+  if (ADMIN_EMAIL && email === ADMIN_EMAIL) return true
   const planKey = (plan in PLANS ? plan : 'gratuit') as PlanKey
   const limit = PLANS[planKey].limits[type]
   return currentCount < limit

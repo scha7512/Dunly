@@ -129,7 +129,8 @@ export async function GET(req: NextRequest) {
       // Notification au gérant si facture urgente (60+ jours)
       if (type === 'urgente') {
         try {
-          const adminEmail = process.env.ADMIN_EMAIL ?? 'tantonsacha@gmail.com'
+          const adminEmail = process.env.ADMIN_EMAIL ?? ''
+          if (!adminEmail) throw new Error('ADMIN_EMAIL not set')
           await resend.emails.send({
             from: FROM_EMAIL,
             to: adminEmail,

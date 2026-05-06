@@ -1,7 +1,7 @@
 import { NextResponse } from 'next/server'
 import { getResend } from '@/lib/resend/client'
 
-const ADMIN_EMAIL = process.env.ADMIN_EMAIL ?? 'tantonsacha@gmail.com'
+const ADMIN_EMAIL = process.env.ADMIN_EMAIL ?? ''
 
 function emailFacturePayee(data: {
   clientNom: string
