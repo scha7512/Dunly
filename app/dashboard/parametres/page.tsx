@@ -9,6 +9,7 @@ import Header from '@/components/dashboard/Header'
 import Button from '@/components/ui/Button'
 import Input from '@/components/ui/Input'
 import { PLANS } from '@/lib/stripe/client'
+import EmailTemplateEditor from '@/components/dashboard/EmailTemplateEditor'
 
 const TABS = [
   { id: 'compte', label: 'Compte', icon: User },
@@ -290,20 +291,8 @@ export default function ParametresPage() {
               </div>
             </div>
 
-            {/* Templates */}
-            <div className="bg-[#0D0D0D] border border-[#1A1A1A] rounded-2xl p-6">
-              <h3 className="font-semibold text-white mb-6">Templates d&apos;emails</h3>
-              <div className="space-y-3">
-                {['Relance douce (J+30)', 'Relance ferme (J+45)', 'Relance urgente (J+60)'].map(t => (
-                  <div key={t} className="flex items-center justify-between p-4 border border-[#1A1A1A] rounded-xl hover:border-[#252525] transition-colors">
-                    <span className="text-sm text-white">{t}</span>
-                    <Button variant="secondary" size="sm">
-                      Modifier
-                    </Button>
-                  </div>
-                ))}
-              </div>
-            </div>
+            {/* Éditeur de templates */}
+            <EmailTemplateEditor />
           </motion.div>
         )}
 
