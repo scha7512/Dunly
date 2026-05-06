@@ -137,6 +137,7 @@ export default function ParametresPage() {
 
   return (
     <>
+
       {/* Modal En savoir plus */}
       {planDetail && selectedPlan && selectedDetail && (
         <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setPlanDetail(null)}>
@@ -394,7 +395,7 @@ export default function ParametresPage() {
                         size="sm"
                         className="w-full"
                         variant={isPro ? 'primary' : 'secondary'}
-                        onClick={() => toast.success(`Redirection vers le paiement ${plan.name}...`)}
+                        onClick={() => toast.success('Paiement Stripe bientôt disponible !')}
                       >
                         {plan.cta} ⚡
                       </Button>
