@@ -3,7 +3,7 @@
 import { useState, useEffect, useMemo } from 'react'
 import { motion } from 'framer-motion'
 import toast from 'react-hot-toast'
-import { User, Bell, Plug, CreditCard } from 'lucide-react'
+import { User, Bell, Plug, CreditCard, X, Check, ChevronRight } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import Header from '@/components/dashboard/Header'
 import Button from '@/components/ui/Button'
@@ -17,8 +17,79 @@ const TABS = [
   { id: 'abonnement', label: 'Abonnement', icon: CreditCard },
 ]
 
+const PLAN_DETAILS = {
+  gratuit: {
+    color: '#555',
+    description: 'Parfait pour tester Dunly sans engagement. Accès limité aux fonctionnalités de base.',
+    inclus: [
+      '1 client maximum',
+      '3 factures maximum',
+      'Tableau de bord basique',
+      'Accès à l\'interface complète',
+    ],
+    non_inclus: [
+      'Relances automatiques',
+      'Export PDF / CSV',
+      'Support prioritaire',
+      'Clients illimités',
+    ],
+  },
+  starter: {
+    color: '#00CC6A',
+    description: 'Idéal pour les freelances et indépendants qui veulent automatiser leurs relances et gagner du temps.',
+    inclus: [
+      '10 clients',
+      '30 factures par mois',
+      'Relances automatiques (douce, ferme, urgente)',
+      'Templates d\'emails inclus',
+      'Tableau de bord complet',
+      'Support par email sous 48h',
+    ],
+    non_inclus: [
+      'Clients illimités',
+      'Export PDF / CSV',
+      'Templates personnalisables',
+      'Multi-utilisateurs',
+    ],
+  },
+  pro: {
+    color: '#00FF87',
+    description: 'La solution complète pour les PME et agences. Tout ce dont tu as besoin pour encaisser plus vite, sans limite.',
+    inclus: [
+      'Clients illimités',
+      'Factures illimitées',
+      'Relances automatiques avancées',
+      'Templates d\'emails personnalisables',
+      'Analytics & rapports détaillés',
+      'Export PDF / CSV',
+      'Support prioritaire sous 24h',
+    ],
+    non_inclus: [
+      'Multi-utilisateurs (5 comptes)',
+      'Marque blanche sur les emails',
+      'Intégrations Pennylane & QuickBooks',
+      'Account manager dédié',
+    ],
+  },
+  cabinet: {
+    color: '#FFB800',
+    description: 'Pour les cabinets comptables et grandes structures qui gèrent plusieurs clients simultanément.',
+    inclus: [
+      'Tout le plan Pro inclus',
+      'Multi-utilisateurs (jusqu\'à 5 comptes)',
+      'Marque blanche sur les emails de relance',
+      'Intégrations Pennylane & QuickBooks',
+      'Account manager dédié',
+      'SLA garanti 99,9%',
+      'Support téléphonique dédié',
+    ],
+    non_inclus: [],
+  },
+}
+
 export default function ParametresPage() {
   const [tab, setTab] = useState('compte')
+  const [planDetail, setPlanDetail] = useState<string | null>(null)
   // eslint-disable-next-line react-hooks/exhaustive-deps
   const supabase = useMemo(() => createClient(), [])
   const [profile, setProfile] = useState<{
@@ -59,8 +130,81 @@ export default function ParametresPage() {
     }
   }
 
+  // Modal détail plan
+  const selectedPlan = planDetail ? PLANS[planDetail as keyof typeof PLANS] : null
+  const selectedDetail = planDetail ? PLAN_DETAILS[planDetail as keyof typeof PLAN_DETAILS] : null
+
   return (
     <>
+      {/* Modal En savoir plus */}
+      {planDetail && selectedPlan && selectedDetail && (
+        <div className="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 flex items-center justify-center p-4" onClick={() => setPlanDetail(null)}>
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95, y: 20 }}
+            animate={{ opacity: 1, scale: 1, y: 0 }}
+            className="bg-[#0D0D0D] border border-[#1A1A1A] rounded-3xl p-8 max-w-lg w-full relative max-h-[90vh] overflow-y-auto"
+            onClick={e => e.stopPropagation()}
+          >
+            <button onClick={() => setPlanDetail(null)} className="absolute top-4 right-4 text-[#555] hover:text-white transition-colors">
+              <X size={18} />
+            </button>
+
+            {/* Header */}
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-10 h-10 rounded-xl flex items-center justify-center" style={{ background: `${selectedDetail.color}20` }}>
+                <CreditCard size={18} style={{ color: selectedDetail.color }} />
+              </div>
+              <div>
+                <h2 className="font-display font-bold text-xl text-white">{selectedPlan.name}</h2>
+                <p className="text-sm font-bold" style={{ color: selectedDetail.color }}>
+                  {selectedPlan.price === 0 ? 'Gratuit' : `${selectedPlan.price}€/mois`}
+                </p>
+              </div>
+            </div>
+
+            <p className="text-[#888] text-sm mb-6 leading-relaxed">{selectedDetail.description}</p>
+
+            {/* Ce qui est inclus */}
+            <div className="mb-4">
+              <p className="text-xs text-[#555] uppercase tracking-wider mb-3">✅ Ce qui est inclus</p>
+              <div className="space-y-2.5">
+                {selectedDetail.inclus.map((item, i) => (
+                  <div key={i} className="flex items-start gap-2.5">
+                    <Check size={14} className="mt-0.5 flex-shrink-0" style={{ color: selectedDetail.color }} />
+                    <span className="text-sm text-white">{item}</span>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Ce qui n'est pas inclus */}
+            {selectedDetail.non_inclus.length > 0 && (
+              <div className="mb-6">
+                <p className="text-xs text-[#555] uppercase tracking-wider mb-3">❌ Non inclus</p>
+                <div className="space-y-2.5">
+                  {selectedDetail.non_inclus.map((item, i) => (
+                    <div key={i} className="flex items-start gap-2.5">
+                      <X size={14} className="text-[#333] mt-0.5 flex-shrink-0" />
+                      <span className="text-sm text-[#555]">{item}</span>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* CTA */}
+            {(profile?.plan ?? 'gratuit') !== planDetail && planDetail !== 'gratuit' && (
+              <Button className="w-full" onClick={() => { toast.success(`Redirection vers le paiement ${selectedPlan.name}...`); setPlanDetail(null) }}>
+                Choisir {selectedPlan.name} — {selectedPlan.price}€/mois ⚡
+              </Button>
+            )}
+            {(profile?.plan ?? 'gratuit') === planDetail && (
+              <p className="text-center text-sm text-[#00FF87] font-medium">✓ C&apos;est ton plan actuel</p>
+            )}
+          </motion.div>
+        </div>
+      )}
+
       <Header title="Paramètres" subtitle="Gère ton compte et tes préférences" />
       <div className="p-6 max-w-4xl">
         {/* Tabs */}
@@ -248,6 +392,12 @@ export default function ParametresPage() {
                         </li>
                       ))}
                     </ul>
+                    <button
+                      onClick={() => setPlanDetail(key)}
+                      className="flex items-center gap-1 text-xs text-[#555] hover:text-[#00FF87] transition-colors mt-2 mb-3"
+                    >
+                      En savoir plus <ChevronRight size={11} />
+                    </button>
                     {isCurrent ? (
                       <span className="block text-center text-xs text-[#00FF87] font-medium py-2">✓ Plan actuel</span>
                     ) : isDowngrade ? null : (
