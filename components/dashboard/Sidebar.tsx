@@ -5,7 +5,7 @@ import { usePathname, useRouter } from 'next/navigation'
 import { motion } from 'framer-motion'
 import {
   LayoutDashboard, FileText, Users, Send, Settings,
-  LogOut, ChevronRight,
+  LogOut, ChevronRight, Zap,
 } from 'lucide-react'
 import { createClient } from '@/lib/supabase/client'
 import toast from 'react-hot-toast'
@@ -82,6 +82,27 @@ export default function Sidebar({ profile }: SidebarProps) {
           })}
         </ul>
       </nav>
+
+      {/* Upgrade banner pour plan gratuit */}
+      {(!profile?.plan || profile.plan === 'gratuit') && (
+        <div className="mx-3 mb-3">
+          <Link
+            href="/dashboard/parametres"
+            className="block bg-[rgba(0,255,135,0.08)] border border-[rgba(0,255,135,0.2)] rounded-2xl p-3 hover:bg-[rgba(0,255,135,0.12)] transition-colors group"
+          >
+            <div className="flex items-center gap-2 mb-1.5">
+              <Zap size={13} className="text-[#00FF87]" />
+              <span className="text-xs font-bold text-[#00FF87]">Passer au Pro</span>
+            </div>
+            <p className="text-[10px] text-[#555] leading-relaxed">
+              Débloquer les relances automatiques et clients illimités
+            </p>
+            <div className="mt-2 text-[10px] font-bold text-black bg-[#00FF87] rounded-full px-2 py-0.5 text-center">
+              Dès 39€/mois ⚡
+            </div>
+          </Link>
+        </div>
+      )}
 
       {/* User + logout */}
       <div className="p-3 border-t border-[#1A1A1A]">

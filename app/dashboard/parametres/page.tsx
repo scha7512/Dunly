@@ -193,44 +193,93 @@ export default function ParametresPage() {
 
         {/* Abonnement */}
         {tab === 'abonnement' && (
-          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
-            <div className="bg-[#0D0D0D] border border-[rgba(0,255,135,0.2)] rounded-2xl p-6 mb-6">
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} className="space-y-6">
+            {/* Plan actuel */}
+            <div className="bg-[#0D0D0D] border border-[rgba(0,255,135,0.2)] rounded-2xl p-6">
               <div className="flex items-center justify-between">
                 <div>
                   <p className="text-xs text-[#888] uppercase tracking-wider mb-1">Plan actuel</p>
-                  <p className="font-display font-bold text-2xl text-white capitalize">{profile?.plan ?? 'starter'}</p>
+                  <p className="font-display font-bold text-2xl text-white capitalize">{profile?.plan ?? 'gratuit'}</p>
+                  <p className="text-xs text-[#555] mt-1">
+                    {profile?.plan === 'gratuit' || !profile?.plan
+                      ? 'Limité à 1 client et 3 factures'
+                      : profile?.plan === 'starter'
+                      ? '10 clients · 30 factures/mois'
+                      : 'Illimité'}
+                  </p>
                 </div>
                 <span className="text-xs bg-[rgba(0,255,135,0.1)] text-[#00FF87] px-3 py-1.5 rounded-full font-medium">
-                  Actif
+                  ✓ Actif
                 </span>
               </div>
             </div>
 
-            <div className="grid sm:grid-cols-3 gap-4">
+            {/* Grille des plans */}
+            <div className="grid sm:grid-cols-2 lg:grid-cols-4 gap-4">
               {Object.entries(PLANS).map(([key, plan]) => {
-                const isCurrent = profile?.plan === key
+                const isCurrent = (profile?.plan ?? 'gratuit') === key
+                const isPro = key === 'pro'
+                const isDowngrade = key === 'gratuit' && (profile?.plan ?? 'gratuit') !== 'gratuit'
+
                 return (
                   <div
                     key={key}
-                    className={`border rounded-2xl p-5 transition-colors ${
+                    className={`relative border rounded-2xl p-5 flex flex-col transition-colors ${
                       isCurrent
-                        ? 'border-[rgba(0,255,135,0.3)] bg-[rgba(0,255,135,0.04)]'
+                        ? 'border-[rgba(0,255,135,0.4)] bg-[rgba(0,255,135,0.04)]'
+                        : isPro
+                        ? 'border-[rgba(0,255,135,0.2)] bg-[#0D0D0D]'
                         : 'border-[#1A1A1A] bg-[#0D0D0D]'
                     }`}
                   >
-                    <h4 className="font-semibold text-white mb-1">{plan.name}</h4>
-                    <p className="font-display font-bold text-3xl text-white mb-4">{plan.price}€<span className="text-sm text-[#888] font-normal">/mois</span></p>
+                    {isPro && !isCurrent && (
+                      <span className="absolute -top-3 left-1/2 -translate-x-1/2 bg-[#00FF87] text-black text-[10px] font-bold px-3 py-0.5 rounded-full whitespace-nowrap">
+                        POPULAIRE
+                      </span>
+                    )}
+                    <h4 className="font-semibold text-white mb-0.5">{plan.name}</h4>
+                    <p className="font-display font-bold text-3xl text-white mt-1">
+                      {plan.price}€<span className="text-sm text-[#888] font-normal">/mois</span>
+                    </p>
+                    <ul className="mt-3 mb-4 space-y-1.5 flex-1">
+                      {plan.features.slice(0, 3).map((f, i) => (
+                        <li key={i} className="text-xs text-[#888] flex items-start gap-1.5">
+                          <span className="text-[#00FF87] mt-0.5">✓</span> {f}
+                        </li>
+                      ))}
+                    </ul>
                     {isCurrent ? (
-                      <span className="text-xs text-[#00FF87]">✓ Plan actuel</span>
-                    ) : (
-                      <Button size="sm" className="w-full" onClick={() => toast.success('Redirection vers Stripe...')}>
-                        Passer à {plan.name}
+                      <span className="block text-center text-xs text-[#00FF87] font-medium py-2">✓ Plan actuel</span>
+                    ) : isDowngrade ? null : (
+                      <Button
+                        size="sm"
+                        className="w-full"
+                        variant={isPro ? 'primary' : 'secondary'}
+                        onClick={() => toast.success(`Redirection vers le paiement ${plan.name}...`)}
+                      >
+                        {plan.cta} ⚡
                       </Button>
                     )}
                   </div>
                 )
               })}
             </div>
+
+            {/* CTA urgence */}
+            {(profile?.plan === 'gratuit' || !profile?.plan) && (
+              <div className="bg-[rgba(0,255,135,0.04)] border border-[rgba(0,255,135,0.15)] rounded-2xl p-6 flex items-center justify-between gap-4">
+                <div>
+                  <p className="font-semibold text-white mb-1">🚀 Passe au Starter et encaisse plus vite</p>
+                  <p className="text-sm text-[#888]">Relances automatiques, 10 clients, 30 factures/mois. Dès 39€/mois.</p>
+                </div>
+                <Button
+                  onClick={() => toast.success('Redirection vers le paiement...')}
+                  className="flex-shrink-0"
+                >
+                  Commencer ⚡
+                </Button>
+              </div>
+            )}
           </motion.div>
         )}
       </div>
