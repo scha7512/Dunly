@@ -3,6 +3,7 @@ import Hero from '@/components/landing/Hero'
 import ProblemSolution from '@/components/landing/ProblemSolution'
 import HowItWorks from '@/components/landing/HowItWorks'
 import Pricing from '@/components/landing/Pricing'
+import PricingTable from '@/components/landing/PricingTable'
 import Testimonials from '@/components/landing/Testimonials'
 import FAQ from '@/components/landing/FAQ'
 import CTASection from '@/components/landing/CTASection'
@@ -17,6 +18,7 @@ export default function LandingPage() {
       <HowItWorks />
       <Testimonials />
       <Pricing />
+      <PricingTable />
       <FAQ />
       <CTASection />
       <Footer />
