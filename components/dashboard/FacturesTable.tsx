@@ -50,10 +50,27 @@ export default function FacturesTable({ factures: initial, clients, userId }: Pr
   const totalPages = Math.ceil(filtered.length / PER_PAGE)
 
   const markAsPaid = async (id: string) => {
+    const facture = factures.find(f => f.id === id)
     const { error } = await supabase.from('factures').update({ statut: 'payee' }).eq('id', id)
     if (!error) {
       setFactures(f => f.map(x => x.id === id ? { ...x, statut: 'payee' } : x))
       toast.success('Facture marquée comme payée !')
+      // Notification email au gérant
+      if (facture) {
+        fetch('/api/notifications', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            type: 'facture_payee',
+            data: {
+              clientNom: (facture.client as { nom?: string } | null)?.nom ?? 'Client inconnu',
+              numeroFacture: facture.numero,
+              montant: `${facture.montant.toLocaleString('fr-FR')} €`,
+              userEmail: '',
+            },
+          }),
+        }).catch(() => {})
+      }
     }
   }
 

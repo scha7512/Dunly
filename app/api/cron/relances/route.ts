@@ -125,6 +125,34 @@ export async function GET(req: NextRequest) {
         .eq('id', facture.id)
 
       sent++
+
+      // Notification au gérant si facture urgente (60+ jours)
+      if (type === 'urgente') {
+        try {
+          const adminEmail = process.env.ADMIN_EMAIL ?? 'tantonsacha@gmail.com'
+          await resend.emails.send({
+            from: FROM_EMAIL,
+            to: adminEmail,
+            subject: `🚨 URGENT — Facture ${facture.numero} en retard de ${joursRetard} jours`,
+            html: `
+              <div style="background:#050505;padding:40px 20px;font-family:Arial,sans-serif;">
+                <div style="max-width:500px;margin:0 auto;background:#0D0D0D;border:1px solid #FF4444;border-radius:20px;padding:32px;">
+                  <h1 style="color:#FF4444;font-size:24px;margin:0 0 16px;">🚨 Facture critique</h1>
+                  <p style="color:#888;font-size:14px;margin:0 0 24px;">Une facture de ton client dépasse <strong style="color:#FF4444;">${joursRetard} jours</strong> de retard.</p>
+                  <table style="width:100%;border-collapse:collapse;">
+                    <tr><td style="color:#888;font-size:13px;padding:8px 0;border-bottom:1px solid #1A1A1A;">Client</td><td style="color:#fff;font-size:13px;font-weight:600;text-align:right;padding:8px 0;border-bottom:1px solid #1A1A1A;">${client.nom}</td></tr>
+                    <tr><td style="color:#888;font-size:13px;padding:8px 0;border-bottom:1px solid #1A1A1A;">Facture</td><td style="color:#fff;font-size:13px;font-weight:600;text-align:right;padding:8px 0;border-bottom:1px solid #1A1A1A;">${facture.numero}</td></tr>
+                    <tr><td style="color:#888;font-size:13px;padding:8px 0;">Montant</td><td style="color:#FF4444;font-size:18px;font-weight:900;text-align:right;padding:8px 0;">${montantFormate}</td></tr>
+                  </table>
+                  <p style="color:#555;font-size:11px;margin:24px 0 0;text-align:center;">Dunly — Notification automatique</p>
+                </div>
+              </div>`,
+          })
+        } catch {
+          // Notification non critique, on continue
+        }
+      }
+
     } catch (err) {
       const msg = err instanceof Error ? err.message : 'Unknown error'
       errors.push(`Facture ${facture.id}: ${msg}`)
