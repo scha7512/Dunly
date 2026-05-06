@@ -8,6 +8,7 @@ import { createClient } from '@/lib/supabase/client'
 import { formatMontant, formatDate, joursRetard, getStatutLabel } from '@/utils/format'
 import type { Facture, Client } from '@/types'
 import Button from '@/components/ui/Button'
+import CSVImportModal from '@/components/dashboard/CSVImportModal'
 
 interface Props {
   factures: (Facture & { client?: Partial<Client> | null })[]
@@ -32,6 +33,7 @@ export default function FacturesTable({ factures: initial, clients, userId }: Pr
   const [statut, setStatut] = useState('tous')
   const [page, setPage] = useState(1)
   const [showModal, setShowModal] = useState(false)
+  const [showCSVImport, setShowCSVImport] = useState(false)
   const [editingFacture, setEditingFacture] = useState<Facture | null>(null)
   const [loading, setLoading] = useState(false)
 
@@ -138,7 +140,10 @@ export default function FacturesTable({ factures: initial, clients, userId }: Pr
         </div>
 
         <div className="flex items-center gap-2">
-          <button className="flex items-center gap-2 text-xs text-[#888] border border-[#1A1A1A] px-3 py-2 rounded-xl hover:border-[#333] transition-colors">
+          <button
+            onClick={() => setShowCSVImport(true)}
+            className="flex items-center gap-2 text-xs text-[#888] border border-[#1A1A1A] px-3 py-2 rounded-xl hover:border-[#333] hover:text-white transition-colors"
+          >
             <Upload size={13} />
             Import CSV
           </button>
@@ -286,6 +291,17 @@ export default function FacturesTable({ factures: initial, clients, userId }: Pr
           />
         )}
       </AnimatePresence>
+
+      {/* CSV Import Modal */}
+      <CSVImportModal
+        open={showCSVImport}
+        onClose={() => setShowCSVImport(false)}
+        userId={userId}
+        onImported={() => {
+          setShowCSVImport(false)
+          window.location.reload()
+        }}
+      />
     </div>
   )
 }
